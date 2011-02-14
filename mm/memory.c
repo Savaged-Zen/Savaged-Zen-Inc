@@ -1224,7 +1224,7 @@ unsigned long unmap_vmas(struct mmu_gather *tlb,
 
 				start = end;
 			} else
-				start = unmap_page_range(*tlbp, vma,
+				start = unmap_page_range(tlb, vma,
 						start, end, &zap_work, details, activate);
 
 			if (zap_work > 0) {
@@ -1267,8 +1267,7 @@ unsigned long zap_page_range(struct vm_area_struct *vma, unsigned long address,
 	tlb_gather_mmu(&tlb, mm, 0);
 	update_hiwater_rss(mm);
 	end = unmap_vmas(&tlb, vma, address, end, &nr_accounted, details, activate);
-	if (tlb)
-		tlb_finish_mmu(tlb, address, end);
+	tlb_finish_mmu(&tlb, address, end);
 	return end;
 }
 
@@ -2530,7 +2529,7 @@ again:
 
 	restart_addr = zap_page_range(vma, start_addr,
 				end_addr - start_addr, details, true);
-	need_break = need_resched() || spin_needbreak(details->i_mmap_lock);
+	need_break = need_resched() || mutex_is_contended(details->i_mmap_lock);
 
 	if (restart_addr >= end_addr) {
 		/* We have now completed this vma: mark it so */
