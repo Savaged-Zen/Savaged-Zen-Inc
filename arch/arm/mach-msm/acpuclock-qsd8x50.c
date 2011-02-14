@@ -304,7 +304,7 @@ static void select_clock(unsigned src, unsigned config)
 	writel(val | ((src & 3) << 1), SPSS_CLK_SEL_ADDR);
 }
 
-+static int acpu_set_vdd(int vdd)
+static int acpu_set_vdd(int vdd)
 {
 	int rc = 0;
 
